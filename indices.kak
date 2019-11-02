@@ -3,29 +3,28 @@ define-command enable-indices -docstring 'enable persistent selections indices i
 }
 
 define-command show-indices -docstring 'show selections indices in gutter' %{
-  set-face Indices default
+  set-face window Indices default
 
   declare-option line-specs indices_flags
   # from previous call
-  remove-highlighter window/hlflags_indices_flags
-  add-highlighter window flag_lines Indices indices_flags
+  remove-highlighter window/indices
+  add-highlighter window/indices flag-lines Indices indices_flags
 
-  %sh{
+  evaluate-commands %sh{
     index=0
-    printf "set window indices_flags %%^$kak_timestamp"
-    printf '%s\n' "$kak_selections_desc" | tr ':' '\n' |
+    printf "set-option window indices_flags $kak_timestamp"
+    printf '%s\n' "$kak_selections_desc" | tr ' ' '\n' |
     while read desc; do
       first_line="$(cut -d '.' -f 1 <<< "$desc")"
       index=$(($index + 1))
-      printf ":%s|%s " $first_line $index
+      printf " %s|%s" $first_line $index
     done
-    printf ^\\n
   }
 }
 
 define-command hide-indices -docstring 'hide selections indices in gutter' %{
   remove-hooks window indices
-  remove-highlighter window/hlflags_indices_flags
+  remove-highlighter window/indices
 }
 
 # Suggested hook
